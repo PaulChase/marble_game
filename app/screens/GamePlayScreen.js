@@ -1,36 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { ImageBackground, SafeAreaView, Text, TouchableOpacity, View, Modal } from "react-native";
-import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { FontAwesome5, Ionicons, FontAwesome } from "@expo/vector-icons";
+import Header from "../components/Header";
+import { MarbleContext } from "../contexts/MarbleContext";
+import Marble from "../components/Marble";
 
 const STAKE_MAX = 5;
 const STAKE_MIN = 1;
 
-export default function GamePlayScreen() {
-	const [computerStake, setComputerStake] = useState(4);
+export default function GamePlayScreen({ navigation }) {
+	const [computerStake, setComputerStake] = useState(null);
 	const [isEven, setIsEven] = useState(null);
 	const [ifWon, setIfWon] = useState(false);
 	const [ifLost, setifLost] = useState(false);
-	const [stake, setStake] = useState(3);
-	const [reward, setReward] = useState(3);
+	const [userStake, setUserStake] = useState(3);
+	const [reward, setReward] = useState(null);
+	const [punishment, setPunishment] = useState(null);
+
+	const { marblesCount, addMarbles, subtractMarbles } = useContext(MarbleContext);
 
 	const incrementStake = () => {
-		if (stake === STAKE_MAX) return;
-		setStake(stake + 1);
+		if (userStake === STAKE_MAX) return;
+		setUserStake(userStake + 1);
 	};
 
 	const decrementStake = () => {
-		if (stake === STAKE_MIN) return;
+		if (userStake === STAKE_MIN) return;
 
-		setStake(stake - 1);
+		setUserStake(userStake - 1);
 	};
 
 	const giveRewards = () => {
-		if (computerStake >= stake) {
-			setReward(stake);
+		if (computerStake >= userStake) {
+			setReward(userStake);
 			setIfWon(true);
-		} else if (computerStake < stake) {
+			addMarbles(userStake);
+		} else if (computerStake < userStake) {
 			setReward(computerStake);
 			setIfWon(true);
+			addMarbles(computerStake);
+		}
+	};
+
+	const givePunishment = () => {
+		if (computerStake >= userStake) {
+			setPunishment(userStake);
+			setifLost(true);
+			subtractMarbles(userStake);
+		} else if (computerStake < userStake) {
+			setPunishment(computerStake);
+			setifLost(true);
+			subtractMarbles(computerStake);
 		}
 	};
 
@@ -44,8 +64,35 @@ export default function GamePlayScreen() {
 		} else if (computerStake % 2 != 0 && !isEven) {
 			giveRewards();
 		} else {
-			setifLost(true);
+			givePunishment();
 		}
+	};
+
+	const setComputerNumber = () => {
+		const randomNumber = Math.floor(Math.random() * 5) + 1;
+		setComputerStake(randomNumber);
+	};
+
+	useEffect(() => {
+		let isMounted = true;
+
+		if (isMounted) {
+			setComputerNumber();
+		}
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
+
+	const closeWinModal = () => {
+		setIfWon(false);
+		setComputerNumber();
+	};
+
+	const closeLostModal = () => {
+		setifLost(false);
+		setComputerNumber();
 	};
 
 	return (
@@ -53,17 +100,7 @@ export default function GamePlayScreen() {
 			<ImageBackground source={require("../../assets/game_bg.jpg")} resizeMode="cover" className=" flex-1  px-4 py-10 ">
 				<SafeAreaView className=" flex-1">
 					{/* top nav */}
-					<View className=" flex-row items-center justify-between">
-						<View className="  flex-row space-x-4 py-2 px-4 bg-white rounded-3xl self-start">
-							<FontAwesome5 name="user-circle" size={24} color="yellow" />
-							<Text className=" text-gray-800 font-bold text-2xl">PaulChase</Text>
-						</View>
-
-						<View className="  flex-row space-x-4 py-2 px-4 bg-white rounded-3xl self-start">
-							<FontAwesome5 name="basketball-ball" size={24} color="red" />
-							<Text className=" text-gray-800 font-bold text-2xl">25</Text>
-						</View>
-					</View>
+					<Header />
 
 					<View className=" flex-1 mt-20">
 						<Text className=" text-4xl font-extrabold text-white text-center">Your Turn!!!</Text>
@@ -99,7 +136,7 @@ export default function GamePlayScreen() {
 							</TouchableOpacity>
 
 							<View className="rounded-lg bg-white  items-center justify-center h-full   flex-1 ">
-								<Text className="text-4xl text-gray-700 font-extrabold">{stake}</Text>
+								<Text className="text-4xl text-gray-700 font-extrabold">{userStake}</Text>
 							</View>
 
 							<TouchableOpacity
@@ -125,11 +162,33 @@ export default function GamePlayScreen() {
 			<Modal visible={ifLost} animationType="slide" transparent={true} onRequestClose={() => setifLost(false)}>
 				<View className=" flex-1 bg-black/70 justify-center items-center px-8">
 					<View className=" bg-red-500 border-4 border-white rounded-lg p-4 w-full">
-						<Text className=" text-4xl font-extrabold text-white text-center">Your Lost!!!</Text>
+						<Text className=" text-4xl font-extrabold text-white text-center">Your Lost!</Text>
 						<Text className=" text-7xl font-extrabold text-white text-center my-4">😜</Text>
-						<Text className=" text-3xl font-extrabold text-white text-center">I staked {computerStake}</Text>
+						<Text className=" text-3xl font-extrabold text-white text-center">
+							I staked {computerStake} <Marble size={34} />
+						</Text>
 						<Text className=" text-3xl font-extrabold text-white text-center mt-2">You just lost</Text>
-						<Text className=" text-4xl font-extrabold text-white text-center">{stake} marbles</Text>
+						<Text className=" text-4xl font-extrabold text-white text-center">
+							{punishment} <Marble size={34} />
+						</Text>
+
+						<View className=" mt-4 space-y-4">
+							<TouchableOpacity
+								onPress={closeLostModal}
+								className=" w-full px-10 py-4 rounded-lg bg-blue-800 border-4 border-white flex flex-row justify-center items-center space-x-4"
+							>
+								<FontAwesome name="repeat" size={24} color="white" />
+								<Text className=" font-bold text-white  text-3xl">Play Again</Text>
+							</TouchableOpacity>
+
+							<TouchableOpacity
+								onPress={() => navigation.goBack()}
+								className=" w-full px-10 py-4 rounded-lg bg-gray-600 border-4 border-white flex flex-row justify-center items-center space-x-4"
+							>
+								<FontAwesome name="home" size={24} color="white" />
+								<Text className=" font-bold text-white  text-3xl">Go to Home</Text>
+							</TouchableOpacity>
+						</View>
 					</View>
 				</View>
 			</Modal>
@@ -141,9 +200,31 @@ export default function GamePlayScreen() {
 					<View className=" bg-green-500 border-4 border-white rounded-lg p-4 w-full">
 						<Text className=" text-4xl font-extrabold text-white text-center">Your Won!</Text>
 						<Text className=" text-7xl font-extrabold text-white text-center my-4">😒</Text>
-						<Text className=" text-3xl font-extrabold text-white text-center">I staked {computerStake}</Text>
+						<Text className=" text-3xl font-extrabold text-white text-center">
+							I staked {computerStake} <Marble size={34} />
+						</Text>
 						<Text className=" text-3xl font-extrabold text-white text-center mt-2">You have received</Text>
-						<Text className=" text-4xl font-extrabold text-white text-center">{reward} marbles</Text>
+						<Text className=" text-4xl font-extrabold text-white text-center">
+							{reward} <Marble size={34} />
+						</Text>
+
+						<View className=" mt-4 space-y-4">
+							<TouchableOpacity
+								onPress={closeWinModal}
+								className=" w-full px-10 py-4 rounded-lg bg-blue-800 border-4 border-white flex flex-row justify-center items-center space-x-4"
+							>
+								<FontAwesome name="repeat" size={24} color="white" />
+								<Text className=" font-bold text-white  text-3xl">Play Again</Text>
+							</TouchableOpacity>
+
+							<TouchableOpacity
+								onPress={() => navigation.goBack()}
+								className=" w-full px-10 py-4 rounded-lg bg-gray-600 border-4 border-white flex flex-row justify-center items-center space-x-4"
+							>
+								<FontAwesome name="home" size={24} color="white" />
+								<Text className=" font-bold text-white  text-3xl">Go to Home</Text>
+							</TouchableOpacity>
+						</View>
 					</View>
 				</View>
 			</Modal>
