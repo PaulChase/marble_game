@@ -5,19 +5,21 @@ import Header from "../components/Header";
 import { MarbleContext } from "../contexts/MarbleContext";
 import Marble from "../components/Marble";
 
-const STAKE_MAX = 5;
+const STAKE_MAX = 10;
 const STAKE_MIN = 1;
+const PLAY_TIME = 5;
 
 export default function GamePlayScreen({ navigation }) {
 	const [computerStake, setComputerStake] = useState(null);
-	const [isEven, setIsEven] = useState(null);
+	const [isEven, setIsEven] = useState(false);
 	const [ifWon, setIfWon] = useState(false);
 	const [ifLost, setifLost] = useState(false);
-	const [userStake, setUserStake] = useState(3);
+	const [userStake, setUserStake] = useState(5);
 	const [reward, setReward] = useState(null);
 	const [punishment, setPunishment] = useState(null);
+	const [timeLeft, setTimeLeft] = useState(PLAY_TIME);
 
-	const { marblesCount, addMarbles, subtractMarbles } = useContext(MarbleContext);
+	const { addMarbles, subtractMarbles } = useContext(MarbleContext);
 
 	const incrementStake = () => {
 		if (userStake === STAKE_MAX) return;
@@ -55,10 +57,10 @@ export default function GamePlayScreen({ navigation }) {
 	};
 
 	const handleCheckWin = () => {
-		if (isEven === null) {
-			alert("😠 Choose the type of number I staked! (Odd or Even)");
-			return;
-		}
+		// if (isEven === null) {
+		// 	alert("😠 Choose the type of number I staked! (Odd or Even)");
+		// 	return;
+		// }
 		if (computerStake % 2 == 0 && isEven) {
 			giveRewards();
 		} else if (computerStake % 2 != 0 && !isEven) {
@@ -69,7 +71,7 @@ export default function GamePlayScreen({ navigation }) {
 	};
 
 	const setComputerNumber = () => {
-		const randomNumber = Math.floor(Math.random() * 5) + 1;
+		const randomNumber = Math.floor(Math.random() * STAKE_MAX) + 1;
 		setComputerStake(randomNumber);
 	};
 
@@ -85,14 +87,31 @@ export default function GamePlayScreen({ navigation }) {
 		};
 	}, []);
 
+	useEffect(() => {
+		if (!timeLeft) {
+			handleCheckWin();
+			return;
+		}
+
+		const timerID = setInterval(() => {
+			setTimeLeft(timeLeft - 1);
+		}, 1000);
+
+		return () => clearInterval(timerID);
+	}, [timeLeft]);
+
+	const resetTimer = () => setTimeLeft(PLAY_TIME);
+
 	const closeWinModal = () => {
 		setIfWon(false);
 		setComputerNumber();
+		resetTimer();
 	};
 
 	const closeLostModal = () => {
 		setifLost(false);
 		setComputerNumber();
+		resetTimer();
 	};
 
 	return (
@@ -103,12 +122,19 @@ export default function GamePlayScreen({ navigation }) {
 					<Header />
 
 					<View className=" flex-1 mt-20">
-						<Text className=" text-4xl font-extrabold text-white text-center">Your Turn!!!</Text>
+						<Text className=" text-4xl font-extrabold text-white text-center">Your Turn!</Text>
+					</View>
+
+					<View className=" flex-1 mt-20  items-center justify-center">
+						<Text className=" text-9xl font-extrabold text-white text-center">{timeLeft}</Text>
+						<Text className=" text-4xl font-extrabold text-white text-center">secs</Text>
 					</View>
 
 					{/* actions */}
-					<View className="flex-1  space-y-8  justify-end items-center  ">
-						<View className=" flex-row  items-center    space-x-4 h-20">
+					<View className="flex-1   justify-end items-center  ">
+						<Text className=" text-xl font-extrabold text-white text-center mb-3">Is My number Odd or Even?</Text>
+
+						<View className=" flex-row  items-center    space-x-4 h-20 mb-6">
 							<TouchableOpacity
 								onPress={() => setIsEven(false)}
 								className={`  flex-1 items-center justify-center  h-full rounded-lg ${
@@ -127,6 +153,9 @@ export default function GamePlayScreen({ navigation }) {
 								<Text className="text-4xl  font-extrabold text-white">Even</Text>
 							</TouchableOpacity>
 						</View>
+
+						<Text className=" text-xl font-extrabold text-white text-center mb-3">Stake your Marbles</Text>
+
 						<View className=" flex-row  items-center    space-x-4 h-20">
 							<TouchableOpacity
 								onPress={decrementStake}
@@ -146,13 +175,13 @@ export default function GamePlayScreen({ navigation }) {
 								<FontAwesome5 name="chevron-up" size={24} color="white" />
 							</TouchableOpacity>
 						</View>
-						<TouchableOpacity
+						{/* <TouchableOpacity
 							onPress={handleCheckWin}
 							className=" w-full px-10 py-6 rounded-lg bg-green-800 border-4 border-white flex flex-row justify-center items-center space-x-4"
 						>
 							<FontAwesome5 name="play" size={24} color="white" />
 							<Text className=" font-bold text-white  text-3xl">Stake</Text>
-						</TouchableOpacity>
+						</TouchableOpacity> */}
 					</View>
 				</SafeAreaView>
 			</ImageBackground>

@@ -1,15 +1,42 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const MarbleContext = React.createContext();
 
 export default function MarbleContextComponent({ children }) {
-	const [marblesCount, setMarblesCount] = React.useState(28);
+	const [marblesCount, setMarblesCount] = React.useState(25);
 
 	const addMarbles = (marbles) => setMarblesCount(marblesCount + marbles);
 	const subtractMarbles = (marbles) => setMarblesCount(marblesCount - marbles);
 
+	const getMarblesCount = (marbles) => {
+		setMarblesCount(marbles);
+	};
+
+	useEffect(() => {
+		let isMounted = true;
+
+		const updateMarblesInStorage = async () => {
+			try {
+				await AsyncStorage.setItem("marbles", marblesCount.toString());
+			} catch (error) {
+				console.log("couldnt set marbles");
+			}
+		};
+
+		if (isMounted) {
+			updateMarblesInStorage();
+		}
+
+		return () => {
+			isMounted = false;
+		};
+	}, [marblesCount]);
+
 	return (
-		<MarbleContext.Provider value={{ marblesCount, addMarbles, subtractMarbles }}>{children}</MarbleContext.Provider>
+		<MarbleContext.Provider value={{ marblesCount, addMarbles, subtractMarbles, getMarblesCount }}>
+			{children}
+		</MarbleContext.Provider>
 	);
 }
