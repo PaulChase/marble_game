@@ -3,7 +3,8 @@ import { ImageBackground, SafeAreaView, Text, TouchableOpacity, View, Modal } fr
 import { FontAwesome5, Ionicons, FontAwesome } from "@expo/vector-icons";
 import Header from "../components/Header";
 import { MarbleContext } from "../contexts/MarbleContext";
-import Marble from "../components/Marble";
+import WinModal from "../components/WinModal";
+import LostModal from "../components/LostModal";
 
 const STAKE_MAX = 10;
 const STAKE_MIN = 1;
@@ -57,10 +58,6 @@ export default function GamePlayScreen({ navigation }) {
 	};
 
 	const handleCheckWin = () => {
-		// if (isEven === null) {
-		// 	alert("😠 Choose the type of number I staked! (Odd or Even)");
-		// 	return;
-		// }
 		if (computerStake % 2 == 0 && isEven) {
 			giveRewards();
 		} else if (computerStake % 2 != 0 && !isEven) {
@@ -187,76 +184,26 @@ export default function GamePlayScreen({ navigation }) {
 			</ImageBackground>
 
 			{/* lost modal */}
-
-			<Modal visible={ifLost} animationType="slide" transparent={true} onRequestClose={() => setifLost(false)}>
-				<View className=" flex-1 bg-black/70 justify-center items-center px-8">
-					<View className=" bg-red-500 border-4 border-white rounded-lg p-4 w-full">
-						<Text className=" text-4xl font-extrabold text-white text-center">Your Lost!</Text>
-						<Text className=" text-7xl font-extrabold text-white text-center my-4">😜</Text>
-						<Text className=" text-3xl font-extrabold text-white text-center">
-							I staked {computerStake} <Marble size={34} />
-						</Text>
-						<Text className=" text-3xl font-extrabold text-white text-center mt-2">You just lost</Text>
-						<Text className=" text-4xl font-extrabold text-white text-center">
-							{punishment} <Marble size={34} />
-						</Text>
-
-						<View className=" mt-4 space-y-4">
-							<TouchableOpacity
-								onPress={closeLostModal}
-								className=" w-full px-10 py-4 rounded-lg bg-blue-800 border-4 border-white flex flex-row justify-center items-center space-x-4"
-							>
-								<FontAwesome name="repeat" size={24} color="white" />
-								<Text className=" font-bold text-white  text-3xl">Play Again</Text>
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								onPress={() => navigation.goBack()}
-								className=" w-full px-10 py-4 rounded-lg bg-gray-600 border-4 border-white flex flex-row justify-center items-center space-x-4"
-							>
-								<FontAwesome name="home" size={24} color="white" />
-								<Text className=" font-bold text-white  text-3xl">Go to Home</Text>
-							</TouchableOpacity>
-						</View>
-					</View>
-				</View>
-			</Modal>
+			{ifLost && (
+				<LostModal
+					ifLost={ifLost}
+					navigation={navigation}
+					closeLostModal={closeLostModal}
+					computerStake={computerStake}
+					punishment={punishment}
+				/>
+			)}
 
 			{/* won modal */}
-
-			<Modal visible={ifWon} animationType="slide" transparent={true} onRequestClose={() => setIfWon(false)}>
-				<View className=" flex-1 bg-black/70 justify-center items-center px-8">
-					<View className=" bg-green-500 border-4 border-white rounded-lg p-4 w-full">
-						<Text className=" text-4xl font-extrabold text-white text-center">Your Won!</Text>
-						<Text className=" text-7xl font-extrabold text-white text-center my-4">😒</Text>
-						<Text className=" text-3xl font-extrabold text-white text-center">
-							I staked {computerStake} <Marble size={34} />
-						</Text>
-						<Text className=" text-3xl font-extrabold text-white text-center mt-2">You have received</Text>
-						<Text className=" text-4xl font-extrabold text-white text-center">
-							{reward} <Marble size={34} />
-						</Text>
-
-						<View className=" mt-4 space-y-4">
-							<TouchableOpacity
-								onPress={closeWinModal}
-								className=" w-full px-10 py-4 rounded-lg bg-blue-800 border-4 border-white flex flex-row justify-center items-center space-x-4"
-							>
-								<FontAwesome name="repeat" size={24} color="white" />
-								<Text className=" font-bold text-white  text-3xl">Play Again</Text>
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								onPress={() => navigation.goBack()}
-								className=" w-full px-10 py-4 rounded-lg bg-gray-600 border-4 border-white flex flex-row justify-center items-center space-x-4"
-							>
-								<FontAwesome name="home" size={24} color="white" />
-								<Text className=" font-bold text-white  text-3xl">Go to Home</Text>
-							</TouchableOpacity>
-						</View>
-					</View>
-				</View>
-			</Modal>
+			{ifWon && (
+				<WinModal
+					ifWon={ifWon}
+					navigation={navigation}
+					closeWinModal={closeWinModal}
+					reward={reward}
+					computerStake={computerStake}
+				/>
+			)}
 		</View>
 	);
 }

@@ -1,15 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import {
-	ActivityIndicator,
-	ImageBackground,
-	SafeAreaView,
-	Text,
-	TouchableHighlight,
-	TouchableOpacity,
-	View,
-} from "react-native";
-import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { ActivityIndicator, ImageBackground, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
+import { FontAwesome5, Ionicons, AntDesign } from "@expo/vector-icons";
 import Header from "../components/Header";
 import { MarbleContext } from "../contexts/MarbleContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -18,6 +10,7 @@ import { Audio } from "expo-av";
 export default function HomeScreen({ navigation }) {
 	const [isLoading, setIsLoading] = useState(true);
 	const [sound, setSound] = useState(null);
+	const [soundStatus, setSoundStatus] = useState(null);
 
 	const { getMarblesCount } = useContext(MarbleContext);
 
@@ -46,25 +39,33 @@ export default function HomeScreen({ navigation }) {
 		};
 	}, []);
 
-	async function playSound() {
-		console.log("Loading Sound");
-		const { sound } = await Audio.Sound.createAsync(require("../../assets/Forever.mp3"));
+	async function playBgMusic() {
+		const { sound } = await Audio.Sound.createAsync(require("../../assets/sound/bg_music.mp3"));
 		setSound(sound);
 
-		console.log("Playing Sound");
 		await sound.playAsync();
+		setSoundStatus(true);
 		await sound.setIsLoopingAsync(true);
 	}
 
 	useEffect(() => {
-		playSound();
+		playBgMusic();
 		return sound
 			? () => {
-					console.log("Unloading Sound");
 					sound.unloadAsync();
 			  }
 			: undefined;
 	}, []);
+
+	const toggleMusicPlay = async () => {
+		if (soundStatus) {
+			await sound.pauseAsync();
+			setSoundStatus(false);
+		} else {
+			await sound.playAsync();
+			setSoundStatus(true);
+		}
+	};
 
 	if (isLoading) {
 		return (
@@ -93,9 +94,13 @@ export default function HomeScreen({ navigation }) {
 							<FontAwesome5 name="play" size={24} color="white" />
 							<Text className=" font-bold text-white text-center text-3xl">Play Game</Text>
 						</TouchableOpacity>
-						<TouchableOpacity className=" w-4/5 px-10 py-6 rounded-lg bg-green-600 border-4 border-white flex flex-row space-x-4">
-							<Ionicons name="settings" size={24} color="white" />
-							<Text className=" font-bold text-white text-center text-3xl">Settings</Text>
+
+						<TouchableOpacity
+							onPress={toggleMusicPlay}
+							className=" w-4/5 px-10 py-6 rounded-lg bg-green-600 border-4 border-white flex flex-row space-x-4"
+						>
+							<FontAwesome5 name={soundStatus ? "volume-up" : "volume-mute"} size={24} color="white" />
+							<Text className=" font-bold text-white text-center text-3xl">Sound</Text>
 						</TouchableOpacity>
 						<TouchableOpacity className=" w-4/5 px-10 py-6 rounded-lg bg-green-600 border-4 border-white flex flex-row space-x-4">
 							<FontAwesome5 name="info-circle" size={24} color="white" />
