@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import { MarbleContext } from "../contexts/MarbleContext";
 import WinModal from "../components/WinModal";
 import LostModal from "../components/LostModal";
+import { StatsContext } from "../contexts/StatsContext";
 
 const STAKE_MAX = 10;
 const STAKE_MIN = 1;
@@ -21,6 +22,7 @@ export default function GamePlayScreen({ navigation }) {
 	const [timeLeft, setTimeLeft] = useState(PLAY_TIME);
 
 	const { addMarbles, subtractMarbles } = useContext(MarbleContext);
+	const { incrementPlays, incrementWins } = useContext(StatsContext);
 
 	const incrementStake = () => {
 		if (userStake === STAKE_MAX) return;
@@ -43,6 +45,7 @@ export default function GamePlayScreen({ navigation }) {
 			setIfWon(true);
 			addMarbles(computerStake);
 		}
+		incrementWins();
 	};
 
 	const givePunishment = () => {
@@ -65,6 +68,7 @@ export default function GamePlayScreen({ navigation }) {
 		} else {
 			givePunishment();
 		}
+		incrementPlays();
 	};
 
 	const setComputerNumber = () => {
@@ -131,20 +135,22 @@ export default function GamePlayScreen({ navigation }) {
 					<View className="flex-1   justify-end items-center  ">
 						<Text className=" text-xl font-extrabold text-white text-center mb-3">Is My number Odd or Even?</Text>
 
-						<View className=" flex-row  items-center    space-x-4 h-20 mb-6">
+						<View className=" flex-row  items-center    space-x-4 h-20 mb-6 bg-gray-50 p-2 rounded-lg">
 							<TouchableOpacity
+								activeOpacity={0.8}
 								onPress={() => setIsEven(false)}
 								className={`  flex-1 items-center justify-center  h-full rounded-lg ${
-									isEven === false ? " bg-blue-600" : "bg-gray-600"
+									isEven === false ? " bg-blue-600" : "bg-gray-400"
 								}  `}
 							>
 								<Text className="text-4xl  font-extrabold text-white">Odd</Text>
 							</TouchableOpacity>
 
 							<TouchableOpacity
+								activeOpacity={0.8}
 								onPress={() => setIsEven(true)}
 								className={`  flex-1 items-center justify-center  h-full rounded-lg ${
-									isEven ? " bg-blue-600" : "bg-gray-600"
+									isEven ? " bg-blue-500" : "bg-gray-400"
 								}  `}
 							>
 								<Text className="text-4xl  font-extrabold text-white">Even</Text>
@@ -153,15 +159,15 @@ export default function GamePlayScreen({ navigation }) {
 
 						<Text className=" text-xl font-extrabold text-white text-center mb-3">Stake your Marbles</Text>
 
-						<View className=" flex-row  items-center    space-x-4 h-20">
+						<View className=" flex-row  items-center    space-x-4 h-20 bg-gray-50 p-2 rounded-lg">
 							<TouchableOpacity
 								onPress={decrementStake}
 								className="  flex-1 items-center justify-center  h-full rounded-lg bg-pink-500 border-4 border-white "
 							>
-								<FontAwesome5 name="chevron-down" size={24} color="white" />
+								<FontAwesome5 name="chevron-down" size={28} color="white" />
 							</TouchableOpacity>
 
-							<View className="rounded-lg bg-white  items-center justify-center h-full   flex-1 ">
+							<View className="rounded-lg bg-gray-200  items-center justify-center h-full   flex-1 ">
 								<Text className="text-4xl text-gray-700 font-extrabold">{userStake}</Text>
 							</View>
 
@@ -169,7 +175,7 @@ export default function GamePlayScreen({ navigation }) {
 								onPress={incrementStake}
 								className=" flex-1  h-full items-center justify-center rounded-lg bg-blue-500 border-4 border-white "
 							>
-								<FontAwesome5 name="chevron-up" size={24} color="white" />
+								<FontAwesome5 name="chevron-up" size={28} color="white" />
 							</TouchableOpacity>
 						</View>
 						{/* <TouchableOpacity

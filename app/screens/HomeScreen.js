@@ -6,11 +6,13 @@ import Header from "../components/Header";
 import { MarbleContext } from "../contexts/MarbleContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
+import StatsModal from "../components/StatsModal";
 
 export default function HomeScreen({ navigation }) {
 	const [isLoading, setIsLoading] = useState(true);
 	const [sound, setSound] = useState(null);
 	const [soundStatus, setSoundStatus] = useState(null);
+	const [showStatsModal, setShowStatsModal] = useState(false);
 
 	const { getMarblesCount } = useContext(MarbleContext);
 
@@ -88,6 +90,7 @@ export default function HomeScreen({ navigation }) {
 					{/* actions */}
 					<View className="flex-1  space-y-8  justify-center items-center ">
 						<TouchableOpacity
+							activeOpacity={0.8}
 							onPress={() => navigation.navigate("GamePlay")}
 							className=" w-4/5 px-10 py-6 rounded-lg bg-green-600 border-4 border-white flex flex-row space-x-4"
 						>
@@ -96,17 +99,30 @@ export default function HomeScreen({ navigation }) {
 						</TouchableOpacity>
 
 						<TouchableOpacity
+							activeOpacity={0.8}
 							onPress={toggleMusicPlay}
 							className=" w-4/5 px-10 py-6 rounded-lg bg-green-600 border-4 border-white flex flex-row space-x-4"
 						>
 							<FontAwesome5 name={soundStatus ? "volume-up" : "volume-mute"} size={24} color="white" />
 							<Text className=" font-bold text-white text-center text-3xl">Sound</Text>
 						</TouchableOpacity>
-						<TouchableOpacity className=" w-4/5 px-10 py-6 rounded-lg bg-green-600 border-4 border-white flex flex-row space-x-4">
+						<TouchableOpacity
+							activeOpacity={0.8}
+							onPress={() => setShowStatsModal(true)}
+							className=" w-4/5 px-10 py-6 rounded-lg bg-green-600 border-4 border-white flex flex-row space-x-4"
+						>
+							<Ionicons name="stats-chart" size={24} color="white" />
+							<Text className=" font-bold text-white text-center text-3xl">Stats</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							activeOpacity={0.8}
+							className=" w-4/5 px-10 py-6 rounded-lg bg-green-600 border-4 border-white flex flex-row space-x-4"
+						>
 							<FontAwesome5 name="info-circle" size={24} color="white" />
 							<Text className=" font-bold text-white text-center text-3xl">Help</Text>
 						</TouchableOpacity>
 					</View>
+					<StatsModal showStatsModal={showStatsModal} closeModal={() => setShowStatsModal(false)} />
 					<StatusBar style="auto" />
 				</SafeAreaView>
 			</ImageBackground>

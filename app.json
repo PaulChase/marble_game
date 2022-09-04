@@ -1,31 +1,34 @@
 {
-	"expo": {
-		"name": "Ali Game",
-		"slug": "Ali",
-		"version": "1.0.0",
-		"orientation": "portrait",
-		"icon": "./assets/main_icon.png",
-		"userInterfaceStyle": "light",
-		"splash": {
-			"image": "./assets/splash_screen.png",
-			"resizeMode": "contain",
-			"backgroundColor": "#000000"
-		},
-		"updates": {
-			"fallbackToCacheTimeout": 0
-		},
-		"assetBundlePatterns": ["**/*"],
-		"ios": {
-			"supportsTablet": true
-		},
-		"android": {
-			"adaptiveIcon": {
-				"foregroundImage": "./assets/main_icon.png",
-				"backgroundColor": "#FFFFFF"
-			}
-		},
-		"web": {
-			"favicon": "./assets/favicon.png"
-		}
-	}
+  "expo": {
+    "name": "Ali Game",
+    "slug": "Ali",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/main_icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash_screen.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/main_icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.paulstack.Ali"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
 }
