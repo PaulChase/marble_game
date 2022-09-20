@@ -1,11 +1,12 @@
 import React, { useState, useContext, useEffect } from "react";
-import { ImageBackground, SafeAreaView, Text, TouchableOpacity, View, Modal } from "react-native";
+import { ImageBackground, SafeAreaView, Text, TouchableOpacity, View, Modal, BackHandler } from "react-native";
 import { FontAwesome5, Ionicons, FontAwesome } from "@expo/vector-icons";
 import Header from "../components/Header";
 import { MarbleContext } from "../contexts/MarbleContext";
 import WinModal from "../components/WinModal";
 import LostModal from "../components/LostModal";
 import { StatsContext } from "../contexts/StatsContext";
+import { PlaysLeftContext } from "../contexts/PlaysLeftContext";
 
 const STAKE_MAX = 10;
 const STAKE_MIN = 1;
@@ -23,6 +24,7 @@ export default function GamePlayScreen({ navigation }) {
 
 	const { addMarbles, subtractMarbles } = useContext(MarbleContext);
 	const { incrementPlays, incrementWins } = useContext(StatsContext);
+	const { incrementPlaysLeft, decrementPlaysLeft } = useContext(PlaysLeftContext);
 
 	const incrementStake = () => {
 		if (userStake === STAKE_MAX) return;
@@ -58,6 +60,7 @@ export default function GamePlayScreen({ navigation }) {
 			setifLost(true);
 			subtractMarbles(computerStake);
 		}
+		decrementPlaysLeft();
 	};
 
 	const handleCheckWin = () => {
@@ -100,6 +103,13 @@ export default function GamePlayScreen({ navigation }) {
 
 		return () => clearInterval(timerID);
 	}, [timeLeft]);
+
+	// don't allow the user to leave if the countdown is still counting
+	useEffect(() => {
+		const backHandlerEvent = BackHandler.addEventListener("hardwareBackPress", () => true);
+
+		return () => backHandlerEvent.remove();
+	}, []);
 
 	const resetTimer = () => setTimeLeft(PLAY_TIME);
 
