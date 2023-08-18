@@ -25,7 +25,7 @@ export default function StatsContextComponent({ children }) {
 					setPlaysCount(0);
 				}
 			} catch (e) {
-				console.log("couldnt get plays count ");
+				alert("couldnt get plays count ");
 			}
 		};
 
@@ -50,7 +50,7 @@ export default function StatsContextComponent({ children }) {
 					setWinsCount(0);
 				}
 			} catch (e) {
-				console.log("couldnt get plays count ");
+				alert("couldnt get plays count ");
 			}
 		};
 

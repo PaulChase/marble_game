@@ -14,27 +14,27 @@ export default function HomeScreen({ navigation }) {
 	const [soundStatus, setSoundStatus] = useState(null);
 	const [showStatsModal, setShowStatsModal] = useState(false);
 
-	const { getMarblesCount } = useContext(MarbleContext);
+	const { updateMarblesCount } = useContext(MarbleContext);
 
 	useEffect(() => {
 		let isMounted = true;
 
-		const getMarblesCountFromStorage = async () => {
+		const updateMarblesCountFromStorage = async () => {
 			try {
 				const value = await AsyncStorage.getItem("marbles");
 				if (value !== null && isMounted) {
-					getMarblesCount(parseInt(value));
+					updateMarblesCount(parseInt(value));
 					setIsLoading(false);
 				} else if (value === null && isMounted) {
-					getMarblesCount(25);
+					updateMarblesCount(25);
 					setIsLoading(false);
 				}
 			} catch (e) {
-				console.log("couldnt get marbles ");
+				alert("couldnt get marbles ");
 			}
 		};
 
-		getMarblesCountFromStorage();
+		updateMarblesCountFromStorage();
 
 		return () => {
 			isMounted = false;

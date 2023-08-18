@@ -10,7 +10,7 @@ export default function MarbleContextComponent({ children }) {
 	const addMarbles = (marbles) => setMarblesCount(marblesCount + marbles);
 	const subtractMarbles = (marbles) => setMarblesCount(marblesCount - marbles);
 
-	const getMarblesCount = (marbles) => {
+	const updateMarblesCount = (marbles) => {
 		setMarblesCount(marbles);
 	};
 
@@ -21,7 +21,7 @@ export default function MarbleContextComponent({ children }) {
 			try {
 				await AsyncStorage.setItem("marbles", marblesCount.toString());
 			} catch (error) {
-				console.log("couldnt set marbles");
+				alert("couldnt set marbles");
 			}
 		};
 
@@ -35,7 +35,7 @@ export default function MarbleContextComponent({ children }) {
 	}, [marblesCount]);
 
 	return (
-		<MarbleContext.Provider value={{ marblesCount, addMarbles, subtractMarbles, getMarblesCount }}>
+		<MarbleContext.Provider value={{ marblesCount, addMarbles, subtractMarbles, updateMarblesCount }}>
 			{children}
 		</MarbleContext.Provider>
 	);
